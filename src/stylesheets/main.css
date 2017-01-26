@@ -1,0 +1,21 @@
+.card-table {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.hand {
+  display: flex;
+  justify-content: space-between;
+  max-width: 100%;
+}
+
+.card > img {
+  max-width: 100%;
+}
+
+.actions-row {
+  display: flex;
+}
