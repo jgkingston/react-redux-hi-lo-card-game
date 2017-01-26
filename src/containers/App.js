@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { fetchDeckIfNeeded, drawCardIfNeeded, flipNextCard, shuffleDeck, makeGuess, invalidateGuess } from '../actions'
+import { passPlay, fetchDeckIfNeeded, drawCard, drawCardIfNeeded, discardIfNeeded, flipNextCard, shuffleDeck, makeGuess, invalidateGuess, recordResultIfReady } from '../actions'
 import Card from '../components/Card'
 import { mapCardValues } from '../utilities/mapCardValues'
 import "../stylesheets/main.css";
@@ -16,80 +16,99 @@ class App extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch, deck: { deck_id, cards }, guess: { hasGuessed, isHigher, lastCard } } = nextProps
-    dispatch(drawCardIfNeeded(deck_id))
-    if ( hasGuessed && cards && lastCard.value !== cards[0].value ) {
-      const currentCardValue = cards && mapCardValues(cards[0].value)
-      const lastCardValue = mapCardValues(lastCard.value)
-      isHigher ? console.log(currentCardValue, '>', lastCardValue) : console.log(currentCardValue, '<', lastCardValue)
-    }
+    const { dispatch, deck, guess, selectedPlayer } = nextProps
+    setTimeout(() => {
+      dispatch(discardIfNeeded(deck.deck_id))
+      dispatch(recordResultIfReady(deck, guess, selectedPlayer))
+    }, 1000);
+    dispatch(drawCardIfNeeded(deck.deck_id))
   }
 
   handleRefreshClick = e => {
     e.preventDefault()
-
     const { dispatch, deck: { deck_id } } = this.props
     dispatch(shuffleDeck())
     dispatch(invalidateGuess())
-    dispatch(fetchDeckIfNeeded(deck_id))
+    dispatch(fetchDeckIfNeeded())
   }
 
   handleFlipClick = (e, nextCardIsHigher) => {
     e.preventDefault()
-
     const { dispatch, deck: { deck_id, cards }, selectedPlayer } = this.props
-    dispatch(makeGuess(nextCardIsHigher, cards[0], selectedPlayer))
-    dispatch(flipNextCard('discard', deck_id, selectedPlayer))
+    dispatch(makeGuess(nextCardIsHigher, selectedPlayer))
+    dispatch(drawCard(deck_id))
+  }
+
+  handlePass = e => {
+    e.preventDefault()
+    const { dispatch, selectedPlayer } = this.props
+    dispatch(passPlay(selectedPlayer))
   }
 
   render() {
-    const { deck: { deck_id, cards, isFetching }, guess: { hasGuessed, isHigher, lastCard } } = this.props
-    const currentCardValue = cards && mapCardValues(cards[0].value)
-    const lastCardValue = mapCardValues(lastCard.value)
+    const {
+      deck: { deck_id, cards, isFetching, remaining },
+      guess: { hasGuessed, isHigher, lastCard, cardsInPile, correctGuesses },
+      scoreByPlayer,
+      selectedPlayer,
+      players } = this.props
 
     return (
         <div className="card-table">
-          { hasGuessed && (
-            isHigher ? <h2>Guessed: Higher</h2>
-            : <h2>Guessed: Lower</h2>
-          )}
-          { (lastCard.value && !isFetching) && (
-            isHigher ? (currentCardValue > lastCardValue ? <h2>Correct!</h2>
-            : <h2>Wrong</h2>) : (currentCardValue < lastCardValue ? <h2>Correct!</h2>
-            : <h2>Wrong</h2>)
-          )}
-          { isFetching ? <h2>Loading...</h2>
-            : <div className="hand">
-                { lastCard.image &&
-                  <Card image={lastCard.image}/>
-                }
-                { cards && cards.map((card, index) => {
-                  return <Card image={card.image} key={index}/>;
-                }) }
-              </div>
+          <div className="score-board">
+            <h4>Active player: {selectedPlayer}</h4>
+            {
+              players.map((player, index) => {
+                return <h4>{player.name} score: {scoreByPlayer[player.name] ? scoreByPlayer[player.name].points : 0}</h4>
+              })
+            }
+            { hasGuessed && (
+              isHigher ? <h4>Guessed: Higher</h4>
+              : <h4>Guessed: Lower</h4>
+            )}
+            <h4>Player has guessed: {hasGuessed ? 'Yes' : 'No'}</h4>
+            <h4>Correct Guesses {correctGuesses}</h4>
+            <h4>Cards remaing: {remaining}</h4>
+            <h4>Cards in pile: {cardsInPile.join(', ')}</h4>
+          </div>
+          <div className="play-area">
+          <div className="hand">
+            { lastCard.image ?
+              <Card image={lastCard.image}/>
+              : <div className="draw-pile">Discard Pile</div>
+            }
+            { cards ?
+              <Card image={cards[0].image}/>
+              : <div className="discard-pile">Draw Pile</div>
+            }
+          </div>
+          {remaining > 0 &&
+            <div className="actions-row">
+              <button
+                 onClick={(e) => this.handleFlipClick(e, true)}>
+                High
+              </button>
+              <button
+                 onClick={(e) => this.handleFlipClick(e, false)}>
+                Low
+              </button>
+              <button
+                onClick={this.handlePass}
+                disabled={correctGuesses < 3}>
+                Pass
+              </button>
+            </div>
           }
-          <div className="actions-row">
+          <div>
             {deck_id &&
               <button
                  onClick={this.handleRefreshClick}>
                 Shuffle Deck
               </button>
             }
-            {cards &&
-              <button
-                 onClick={(e) => this.handleFlipClick(e, true)}>
-                High
-              </button>
-            }
-            {cards &&
-              <button
-                 onClick={(e) => this.handleFlipClick(e, false)}>
-                Low
-              </button>
-            }
           </div>
         </div>
-
+      </div>
     )
   }
 }
@@ -99,6 +118,7 @@ const mapStateToProps = state => {
     deck: state.deck,
     selectedPlayer: state.selectedPlayer,
     guess: state.guess,
+    scoreByPlayer: state.scoreByPlayer,
     players: state.players
   }
 }
