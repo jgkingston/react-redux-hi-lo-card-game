@@ -9,5 +9,5 @@ const faceCardHash = {
 }
 
 export const mapCardValues = (value) =>  {
-  return parseInt(faceCardHash[value] || value)
+  return parseInt(faceCardHash[value] || value, 10)
 }

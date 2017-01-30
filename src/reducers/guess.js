@@ -1,3 +1,12 @@
+import {
+  RECEIVE_DISCARD_PILE,
+  RECEIVE_PLAYER_PILE,
+  MAKE_GUESS,
+  CORRECT_GUESS,
+  INVALIDATE_GUESS,
+  SELECT_PLAYER
+} from '../actions'
+
 export const guess = (guessState = {
   hasGuessed: false,
   lastCard: {},
@@ -5,29 +14,27 @@ export const guess = (guessState = {
   correctGuesses: 0
 }, action) => {
   switch (action.type) {
-    case 'RECEIVE_DISCARD_PILE':
+    case RECEIVE_DISCARD_PILE:
       return {
         ...guessState,
         hasGuessed: false,
         cardsInPile: guessState.cardsInPile.concat([action.lastCard.code]),
-        lastCard: action.lastCard,
-        correctGuesses: action.deck.piles.discard.remaining - 1
+        lastCard: action.lastCard
       }
-    case 'RECEIVE_PILES':
-      return {
-        ...guessState,
-        hasGuessed: false,
-        cardsInPile: [],
-        lastCard: {},
-        correctGuesses: 0
-      }
-    case 'MAKE_GUESS':
+    case MAKE_GUESS:
       return {
         ...guessState,
         hasGuessed: true,
         isHigher: action.nextCardIsHigher
       }
-    case 'INVALIDATE_GUESS':
+    case CORRECT_GUESS:
+      return {
+        ...guessState,
+        hasGuessed: false,
+        correctGuesses: guessState.correctGuesses + 1
+      }
+    case RECEIVE_PLAYER_PILE:
+    case INVALIDATE_GUESS:
       return {
         ...guessState,
         hasGuessed: false,
@@ -35,7 +42,7 @@ export const guess = (guessState = {
         cardsInPile: [],
         correctGuesses: 0
       }
-    case 'SELECT_PLAYER':
+    case SELECT_PLAYER:
       return {
         ...guessState,
         correctGuesses: 0

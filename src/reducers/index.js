@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import { deck } from './deck'
 import { guess } from './guess'
+import { errors } from './errors'
 import { players, scoreByPlayer, selectedPlayer } from './players'
 
 const rootReducer = combineReducers({
@@ -8,7 +9,8 @@ const rootReducer = combineReducers({
   selectedPlayer,
   guess,
   scoreByPlayer,
-  players
+  players,
+  errors
 })
 
 export default rootReducer

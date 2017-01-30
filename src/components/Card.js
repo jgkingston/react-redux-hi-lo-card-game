@@ -1,21 +1,20 @@
-import React from "react";
+import React, { Component, PropTypes } from "react";
 import "../stylesheets/main.css";
 
 // Card component
-export default class Card extends React.Component {
-
-  constructor(props) {
-    super(props);
+export default class Card extends Component {
+  static propTypes = {
+    image: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    suit: PropTypes.string.isRequired
   }
-
   // render
   render() {
-    const { image } = this.props;
+    const { image, value, suit } = this.props;
 
-    // render
     return (
       <div className='card'>
-        <img src={ image } alt='foo'/>
+        <img src={ image } alt={`${value} of ${suit}`}/>
       </div>
     );
   }

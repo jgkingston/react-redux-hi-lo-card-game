@@ -2,12 +2,15 @@ import { mapCardValues } from '../utilities/mapCardValues'
 
 export const REQUEST_DECK = 'REQUEST_DECK'
 export const RECEIVE_DECK = 'RECEIVE_DECK'
-export const RECEIVE_PILES = 'RECEIVE_PILES'
+export const RECEIVE_PLAYER_PILE = 'RECEIVE_PLAYER_PILE'
 export const SHUFFLE_DECK = 'SHUFFLE_DECK'
 export const SELECT_PLAYER = 'SELECT_PLAYER'
 export const MAKE_GUESS = 'MAKE_GUESS'
+export const CORRECT_GUESS = 'CORRECT_GUESS'
 export const INVALIDATE_GUESS = 'INVALIDATE_GUESS'
+export const RESET_SCORES = 'RESET_SCORES'
 export const RECEIVE_DISCARD_PILE = 'RECEIVE_DISCARD_PILE'
+export const RECEIVE_ERROR = 'RECEIVE_ERROR'
 
 
 export const selectPlayer = player => ({
@@ -30,8 +33,8 @@ export const receiveDeck = json => ({
   receivedAt: Date.now()
 })
 
-export const receivePiles = (json, player) => ({
-  type: RECEIVE_PILES,
+export const receivePlayerPile = (json, player) => ({
+  type: RECEIVE_PLAYER_PILE,
   deck: json,
   player,
   receivedAt: Date.now()
@@ -51,24 +54,83 @@ export const makeGuess = (nextCardIsHigher, player) => ({
   player
 })
 
+export const correctGuess = () => ({
+  type: CORRECT_GUESS
+})
+
 export const invalidateGuess = () => ({
   type: INVALIDATE_GUESS
 })
 
+export const resetScores = () => ({
+  type: RESET_SCORES
+})
+
+export const receiveError = error => ({
+  type:  RECEIVE_ERROR,
+  error
+})
+
 const baseURI = 'https://deckofcardsapi.com/api/deck/';
+
+async function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response.json();
+  }
+  const errorResponse = await response.json()
+  const error = new Error(errorResponse.error);
+  error.response = response;
+  throw error;
+}
 
 const fetchDeck = deck_id => dispatch => {
   const id = 'new' // || deck_id // was shuffling existing deck, but the piles persist after shuffle
   dispatch(requestDeck())
+
   return fetch(baseURI + id + '/shuffle/') //?deck_count=1 assumed
-    .then(response => response.json())
+    .then(checkStatus)
     .then(json => dispatch(receiveDeck(json)))
+    .catch(error => dispatch(receiveError(error)))
 }
 
 export const drawCard = deck_id => dispatch => {
+  dispatch(requestDeck())
   return fetch(baseURI + deck_id +'/draw/?count=1')
-    .then(response => response.json())
+    .then(checkStatus)
     .then(json => dispatch(receiveDeck(json)))
+    .catch(error => dispatch(receiveError(error)))
+}
+
+// https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/<<pile_name>>/add/?cards=AS,2S
+const addToPlayerPile = (deck, currentCard, player) => dispatch => {
+  const { deck_id, cards } = deck
+  cards.push(currentCard)
+  const cardCodes = cards.map(card => {
+    return card.code
+  }).join(',')
+  dispatch(requestDeck())
+  return fetch(baseURI + deck_id +'/pile/' + player + '/add/?cards=' + cardCodes)
+    .then(checkStatus)
+    .then(json => dispatch(receivePlayerPile(json, player)))
+    .catch(error => dispatch(receiveError(error)))
+}
+
+const drawDiscardPile = (deck_id, cardsInPile, currentCard, selectedPlayer) => dispatch => {
+  // This is a bit silly. I had anticipated having the ability to draw using a ?card_count parameter
+  //  from a pile, but the API does not support that
+  dispatch(requestDeck())
+  return fetch(baseURI + deck_id +'/pile/discard/draw/?cards=' + cardsInPile.join(','))
+    .then(checkStatus)
+    .then(json => dispatch(addToPlayerPile(json, currentCard, selectedPlayer)))
+    .catch(error => dispatch(receiveError(error)))
+}
+
+const discard = (deck_id, card, player, lastCard) => dispatch => {
+  dispatch(requestDeck())
+  return fetch(baseURI + deck_id +'/pile/discard/add/?cards=' + card.code)
+    .then(checkStatus)
+    .then(json => dispatch(receiveDiscardPile(json, player, card)))
+    .catch(error => dispatch(receiveError(error)))
 }
 
 function shouldFetchDeck(state) {
@@ -95,6 +157,8 @@ function shouldDrawCard(state) {
     return false
   } else if (cards) {
     return false
+  } else if ( remaining === 0) {
+    return false
   } else if (!lastCard.value) {
     return true
   } else {
@@ -120,23 +184,10 @@ function shouldDiscard(state) {
   }
 }
 
-const discard = (deck_id, cards, player, lastCard) => dispatch => {
-  const lastCard = cards[0]
-  const cardCodes = cards.map(card => {
-    return card.code
-  }).join(',')
-  dispatch(requestDeck())
-  return fetch(baseURI + deck_id +'/pile/discard/add/?cards=' + cardCodes)
-    .then(response => response.json())
-    .then(json => dispatch(receiveDiscardPile(json, player, lastCard)))
-}
-
 export const discardIfNeeded = () => (dispatch, getState) => {
   const { deck: { deck_id, cards }, selectedPlayer } = getState();
-  console.log('SHOULD DISCARD', shouldDiscard(getState()))
   if (shouldDiscard(getState())) {
-    console.log('DISCARD RECEIVE PROPS')
-    return dispatch(discard(deck_id, cards, selectedPlayer))
+    return dispatch(discard(deck_id, cards[0], selectedPlayer))
   }
 }
 
@@ -161,38 +212,17 @@ function guessIsCorrect(state) {
    return currentCardValue < lastCardValue
 }
 
-const takeDiscardPile = (deck_id, cardsInPile, currentCard, selectedPlayer) => dispatch => {
-  // This is a bit silly. I had anticipated having the ability to draw using a ?card_count parameter
-  //  from a pile, but the API does not support that
-  dispatch(requestDeck())
-  return fetch(baseURI + deck_id +'/pile/discard/draw/?cards=' + cardsInPile.join(','))
-    .then(response => response.json())
-    .then(json => dispatch(addToPlayerPile(json, currentCard, selectedPlayer)))
-}
-
 export const recordResultIfReady = (deck, guess, selectedPlayer) => (dispatch, getState) => {
   const { deck: { deck_id, cards }, guess: { cardsInPile } } = getState()
   if (shouldRecordResult(getState())) {
+    const newCard = cards[0]
     if (guessIsCorrect(getState())) {
-      console.log('DISCARD AFTER GUESS')
-      dispatch(discard(deck_id, cards, selectedPlayer))
+      dispatch(correctGuess())
+      dispatch(discard(deck_id, newCard, selectedPlayer))
     } else {
-      const currentCard = cards[0]
-      dispatch(takeDiscardPile(deck_id, cardsInPile, currentCard, selectedPlayer))
+      dispatch(drawDiscardPile(deck_id, cardsInPile, newCard, selectedPlayer))
     }
   }
-}
-
-// https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/<<pile_name>>/add/?cards=AS,2S
-const addToPlayerPile = (deck, currentCard, player) => dispatch => {
-  const { deck_id, cards } = deck
-  cards.push(currentCard)
-  const cardCodes = cards.map(card => {
-    return card.code
-  }).join(',')
-  return fetch(baseURI + deck_id +'/pile/' + player + '/add/?cards=' + cardCodes)
-    .then(response => response.json())
-    .then(json => dispatch(receivePiles(json, player)))
 }
 
 export const passPlay = (currentPlayer) => dispatch => {

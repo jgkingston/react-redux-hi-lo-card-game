@@ -1,14 +1,64 @@
 .card-table {
   display: flex;
-  min-height: 100vh;
-  align-items: center;
+  flex-direction: column;
+  align-items: top;;
   justify-content: center;
 }
 
-.hand {
+.tracker {
   display: flex;
+  justify-content: center;
+}
+
+.player-tracker > .player:first-of-type {
+  padding-right: 50px;
+}
+
+.player-tracker > .player:last-of-type {
+  padding-left: 50px;
+}
+
+.guess-status, .player {
+  cursor: pointer;
+
+}
+
+.player > h2 {
+  margin-top: 10px;
+}
+
+.play-area {
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
+}
+
+.error-message-container {
+  display: flex;
+  justify-content: center;
+}
+
+.card-piles {
+  display: flex;
+  justify-content: center;
   max-width: 100%;
+}
+
+.card-piles > .card:last-of-type {
+  margin-light: 10px;
+}
+
+.card-piles > .card:first-of-type {
+  margin-right: 10px;
+}
+
+.card-piles > label {
+  text-align: center;
+}
+
+.card {
+  max-width: 226px;
+  max-height: 314px;
 }
 
 .card > img {
@@ -16,13 +66,38 @@
 }
 
 .draw-pile, .discard-pile {
-  width: 224px;
-  height: 312px;
-  border: 1px solid black;
-  border-radius: 15px;
+  width: 226px;
+  height: 314px;
   text-align: center;
 }
 
+.discard-pile {
+  margin-right: 10px;
+}
+
+.draw-pile {
+  margin-left: 10px;
+}
+
+.discard-pile, .draw-pile {
+  cursor: pointer;
+}
+
+.draw-pile > img {
+  width: 226px;
+  height: 314px;
+}
+
 .actions-row {
+  padding-top: 30px;
   display: flex;
+  justify-content: center;
+}
+
+.actions-row > button {
+  min-width: 100px;
+}
+
+.actions-row > button + button {
+  margin-left: 20px;
 }
