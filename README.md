@@ -5,16 +5,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ```sh
 $ git clone https://github.com/jgkingston/react-redux-hi-lo-card-game.git react-hi-lo
-$ cd eact-hi-lo
+$ cd react-hi-lo
 $ npm install
 $ npm start
 
 ```
 
+If you have any issues check to make sure you are running Node ~5.1 and Npm ~3.3
+
 Below you will find some information on how to perform common tasks.<br>
 You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
 
-## Table of Contents General Information on Create React App
+## Table of Contents for General Information on Create React App ... Apps
 
 - [Updating to New Releases](#updating-to-new-releases)
 - [Sending Feedback](#sending-feedback)

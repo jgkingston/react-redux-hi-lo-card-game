@@ -2,6 +2,7 @@
   "name": "react-high-low",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://protected-everglades-40315.herokuapp.com/",
   "devDependencies": {
     "node-sass": "^4.4.0",
     "redux-logger": "^2.6.1",
