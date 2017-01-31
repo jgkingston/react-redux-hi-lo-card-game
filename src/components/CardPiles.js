@@ -14,7 +14,7 @@ export default class CardPiles extends Component {
   static defaultProps = {
     cardsInPile: []
   }
-  
+
   // render
   render() {
     const { cards, cardsInPile, lastCard, remaining } = this.props
@@ -26,7 +26,7 @@ export default class CardPiles extends Component {
           <div title="Discard pile" className="discard-pile">
             { lastCard.image ?
               <Card {...lastCard}/>
-              : 'Discard Pile'
+              : <span>Discard Pile</span>
             }
           </div>
         </label>
@@ -36,7 +36,7 @@ export default class CardPiles extends Component {
             { cards && lastCard.image ?
               <Card {...cards[0]}/>
               : ( remaining > 0 ? <div className="card"><img src='card-back.png' alt="card back"/></div>
-              : 'Draw Pile' )
+              : <span>Draw Pile</span> )
             }
           </div>
         </label>

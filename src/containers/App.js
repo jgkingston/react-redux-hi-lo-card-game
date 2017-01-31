@@ -11,6 +11,13 @@ class App extends Component {
     dispatch: PropTypes.func.isRequired
   }
 
+  constructor(props) {
+    super(props);
+    this.handleFlipClick = this.handleFlipClick.bind(this)
+    this.handleRefreshClick = this.handleRefreshClick.bind(this)
+    this.handlePassClick = this.handlePassClick.bind(this)
+  }
+
   componentDidMount() {
     const { dispatch } = this.props
     dispatch(fetchDeckIfNeeded())
@@ -24,8 +31,8 @@ class App extends Component {
     setTimeout(() => {
       dispatch(discardIfNeeded(deck.deck_id))
       dispatch(recordResultIfReady(deck, guess, selectedPlayer))
-    }, 500);
-    dispatch(drawCardIfNeeded(deck.deck_id))
+      dispatch(drawCardIfNeeded(deck.deck_id))
+    }, 800)
   }
 
   handleRefreshClick = e => {
@@ -41,11 +48,8 @@ class App extends Component {
   handleFlipClick = (nextCardIsHigher) => {
     const { dispatch, deck: { deck_id }, selectedPlayer } = this.props
     this.flipCardSound.play();
-    setTimeout(() => {
-      dispatch(makeGuess(nextCardIsHigher, selectedPlayer))
-      dispatch(drawCard(deck_id))
-    }, 500);
-
+    dispatch(makeGuess(nextCardIsHigher, selectedPlayer))
+    dispatch(drawCard(deck_id))
   }
 
   handlePassClick = e => {
@@ -66,6 +70,7 @@ class App extends Component {
     return (
         <div className="card-table">
           <ScoreBoard
+            remaining={remaining}
             scoreByPlayer={scoreByPlayer}
             selectedPlayer={selectedPlayer}
             players={players}

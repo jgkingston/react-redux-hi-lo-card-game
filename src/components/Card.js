@@ -10,12 +10,12 @@ export default class Card extends Component {
   }
   // render
   render() {
-    const { image, value, suit } = this.props;
+    const { image, value, suit } = this.props
 
     return (
       <div className='card'>
         <img src={ image } alt={`${value} of ${suit}`}/>
       </div>
-    );
+    )
   }
 }
