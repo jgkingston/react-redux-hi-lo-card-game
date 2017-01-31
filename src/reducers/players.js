@@ -28,7 +28,14 @@ const score = (state = {
   }
 }
 
-export const scoreByPlayer = (state = { }, action) => {
+export const scoreByPlayer = (state = {
+  player1: {
+    points: 0
+  },
+  player2: {
+    points: 0
+  }
+}, action) => {
   switch (action.type) {
     case RECEIVE_PLAYER_PILE:
       return {

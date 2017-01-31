@@ -1,12 +1,9 @@
-import React, { Component, PropTypes } from "react";
+import React, { Component } from "react";
 import { Button, Modal } from 'react-bootstrap'
-import "../stylesheets/main.css";
+import "../stylesheets/main.scss";
 
 // RulesModal component
 export default class RulesModal extends Component {
-  static propTypes = {
-
-  }
 
   constructor(props) {
     super(props)
@@ -39,15 +36,15 @@ export default class RulesModal extends Component {
            <Modal.Title>Hi-Lo: The Rules</Modal.Title>
          </Modal.Header>
          <Modal.Body>
-          <p>Play consists of a dealer and a player.</p>
+          <p>Play consists of an automated dealer and two players.</p>
           <ul className="rule-list">
             <li>The dealer draws a card from the top of the deck and places it face up.</li>
-            <li>The player must guess whether the next card drawn from the deck will be higher or lower than the face up card.</li>
+            <li>The active player must guess whether the next card drawn from the deck will be higher or lower than the face up card.</li>
             <li>Once the player guesses, the dealer draws the next card and places it face up on top of the previous card.</li>
             <li>If the player is correct, go back to step 2.</li>
             <li>If the player is wrong, the player receives a point for each card in the face up pile, and the face up pile is discarded. Then play begins at step 1 again.</li>
           </ul>
-          <p>When the player has made three correct guesses in a row, s/he may make another guess, or choose to pass and the roles are reversed with the face up pile continuing to build. The player may choose to continue if there is a high likelihood that their next guess would be correct. If they are wrong, play starts over at step 1 and the player must again make three correct guesses before being allowed to pass. If they are correct, they can continue or pass.</p>
+          <p>When the player has made three correct guesses in a row, s/he may make another guess, or choose to pass and the other player takes a turn guessing with the face up pile continuing to build. The player may choose to continue if there is a high likelihood that their next guess would be correct. If they are wrong, play starts over at step 1 and the player must again make three correct guesses before being allowed to pass. If they are correct, they can continue or pass.</p>
           <p>The goal is to end the game with as few points as possible.</p>
          </Modal.Body>
          <Modal.Footer>

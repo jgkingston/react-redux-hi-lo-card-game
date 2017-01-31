@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from "react";
-import "../stylesheets/main.css";
+import "../stylesheets/main.scss";
 
 // Card component
 export default class Card extends Component {

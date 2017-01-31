@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from "react";
 import Card from '../components/Card'
-import "../stylesheets/main.css";
+import "../stylesheets/main.scss";
 
 // CardPiles component
 export default class CardPiles extends Component {

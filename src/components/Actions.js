@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from "react";
 import RulesModal from './RulesModal'
 import { Button } from 'react-bootstrap'
-import "../stylesheets/main.css";
+import "../stylesheets/main.scss";
 
 // Actions component
 export class Actions extends Component {
   static propTypes = {
-    remaining: PropTypes.number,
+    gameOver: PropTypes.bool,
     correctGuesses: PropTypes.number,
     onFlipClick: PropTypes.func,
     onRefreshClick: PropTypes.func,
@@ -43,7 +43,7 @@ export class Actions extends Component {
 
   // render
   render() {
-    const { remaining, correctGuesses, onPassClick, onRefreshClick } = this.props
+    const { gameOver, correctGuesses, onPassClick, onRefreshClick } = this.props
     const guessNeededToPass = 3 - correctGuesses
 
     return (
@@ -53,14 +53,14 @@ export class Actions extends Component {
             bsStyle="danger"
             bsSize="large"
             onClick={(e) => this.handleFlipClick(e, true)}
-            disabled={!(remaining > 0) || this.state.disabled }>
+            disabled={gameOver || this.state.disabled}>
               Higher
           </Button>
           <Button
             bsStyle="primary"
             bsSize="large"
             onClick={(e) => this.handleFlipClick(e, false)}
-            disabled={!(remaining > 0)  || this.state.disabled }>
+            disabled={gameOver || this.state.disabled}>
               Lower
           </Button>
         </div>
@@ -68,13 +68,13 @@ export class Actions extends Component {
           <Button
             bsStyle="success"
             onClick={onPassClick}
-            disabled={correctGuesses < 3 || !(remaining > 0)}>
+            disabled={correctGuesses < 3 || gameOver}>
               Pass{ guessNeededToPass > 0 && ` (${3 - correctGuesses})`}
           </Button>
           <Button
             bsStyle="warning"
             onClick={onRefreshClick}>
-              Reset Deck
+              { gameOver ? 'Play again?' : 'Reset Deck' }
           </Button>
           <RulesModal/>
         </div>

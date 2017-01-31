@@ -4,7 +4,7 @@ import { passPlay, fetchDeckIfNeeded, drawCard, drawCardIfNeeded, discardIfNeede
 import CardPiles from '../components/CardPiles'
 import ScoreBoard from '../components/ScoreBoard'
 import { Actions as GameActions } from '../components/Actions'
-import "../stylesheets/main.css";
+import "../stylesheets/main.scss";
 
 class App extends Component {
   static propTypes = {
@@ -58,6 +58,8 @@ class App extends Component {
     dispatch(passPlay(selectedPlayer))
   }
 
+
+
   render() {
     const {
       deck: { deck_id, cards, remaining, readyForGuess },
@@ -66,11 +68,18 @@ class App extends Component {
       selectedPlayer,
       players,
       errors } = this.props
+    const gameOver = remaining === 0
 
     return (
         <div className="card-table">
+          { gameOver &&
+            <div className="pyro">
+              <div className="before"></div>
+              <div className="after"></div>
+            </div>
+          }
           <ScoreBoard
-            remaining={remaining}
+            gameOver={gameOver}
             scoreByPlayer={scoreByPlayer}
             selectedPlayer={selectedPlayer}
             players={players}
@@ -88,6 +97,7 @@ class App extends Component {
             }
             {deck_id &&
               <GameActions
+                gameOver={gameOver}
                 readyForGuess={readyForGuess}
                 remaining={remaining}
                 correctGuesses={correctGuesses}
