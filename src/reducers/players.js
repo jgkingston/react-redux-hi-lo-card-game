@@ -43,7 +43,14 @@ export const scoreByPlayer = (state = {
         [action.player]: score(state[action.player], action)
       }
     case RESET_SCORES:
-      return {}
+      return {
+        player1: {
+          points: 0
+        },
+        player2: {
+          points: 0
+        }
+      }
     default:
       return state
   }
