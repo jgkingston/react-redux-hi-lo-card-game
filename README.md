@@ -1,5 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
+A working example can be found here: http://protected-everglades-40315.herokuapp.com/ (it may take a few seconds to load)
+
 ## Overview
 
 ### The Game
