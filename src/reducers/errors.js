@@ -7,8 +7,8 @@ export const errors = (state = { }, action) => {
     case RECEIVE_ERROR:
       return {
         ...state,
-        message: action.error.message,
-        response: action.error.response
+        message: action.message,
+        response: action.response
       }
     default:
       return state

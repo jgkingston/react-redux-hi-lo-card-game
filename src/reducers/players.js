@@ -28,14 +28,16 @@ const score = (state = {
   }
 }
 
-export const scoreByPlayer = (state = {
+const initialState = {
   player1: {
     points: 0
   },
   player2: {
     points: 0
   }
-}, action) => {
+}
+
+export const scoreByPlayer = (state = initialState, action) => {
   switch (action.type) {
     case RECEIVE_PLAYER_PILE:
       return {
@@ -43,14 +45,7 @@ export const scoreByPlayer = (state = {
         [action.player]: score(state[action.player], action)
       }
     case RESET_SCORES:
-      return {
-        player1: {
-          points: 0
-        },
-        player2: {
-          points: 0
-        }
-      }
+      return initialState
     default:
       return state
   }

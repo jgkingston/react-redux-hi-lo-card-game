@@ -6,9 +6,15 @@ import ScoreBoard from '../components/ScoreBoard'
 import { Actions as GameActions } from '../components/Actions'
 import "../stylesheets/main.scss";
 
-class App extends Component {
+export class App extends Component {
   static propTypes = {
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func,
+    deck: PropTypes.object.isRequired,
+    guess: PropTypes.object.isRequired,
+    scoreByPlayer: PropTypes.object.isRequired,
+    selectedPlayer: PropTypes.string.isRequired,
+    players: PropTypes.array.isRequired,
+    errors: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -21,9 +27,9 @@ class App extends Component {
   componentDidMount() {
     const { dispatch } = this.props
     dispatch(fetchDeckIfNeeded())
-    this.flipCardSound = new Audio('flip-card.mp3');
-    this.shuffleSound = new Audio('shuffling-cards-1.mp3');
-    this.shuffleSound.play();
+    this.flipCardSound = new Audio('flip-card.mp3')
+    this.shuffleSound = new Audio('shuffling-cards-1.mp3')
+    this.shuffleSound.play()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -47,7 +53,7 @@ class App extends Component {
 
   handleFlipClick = (nextCardIsHigher) => {
     const { dispatch, deck: { deck_id }, selectedPlayer } = this.props
-    this.flipCardSound.play();
+    this.flipCardSound.play()
     dispatch(makeGuess(nextCardIsHigher, selectedPlayer))
     dispatch(drawCard(deck_id))
   }
@@ -57,8 +63,6 @@ class App extends Component {
     const { dispatch, selectedPlayer } = this.props
     dispatch(passPlay(selectedPlayer))
   }
-
-
 
   render() {
     const {
@@ -92,7 +96,7 @@ class App extends Component {
               lastCard={lastCard}/>
             { errors.message &&
               <div className="error-message-container">
-                <h4 className="text-danger">{errors.response.status} Error: {errors.message}</h4>
+                <h4 className="text-danger">{errors.response && errors.response.status} Error: {errors.message}</h4>
               </div>
             }
             {deck_id &&

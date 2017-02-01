@@ -18,9 +18,8 @@ export const selectPlayer = player => ({
   player
 })
 
-export const shuffleDeck = deck_id => ({
-  type: SHUFFLE_DECK,
-  deck_id
+export const shuffleDeck = () => ({
+  type: SHUFFLE_DECK
 })
 
 export const requestDeck = () => ({
@@ -68,19 +67,20 @@ export const resetScores = () => ({
 
 export const receiveError = error => ({
   type:  RECEIVE_ERROR,
-  error
+  message: error.message,
+  response: error.response
 })
 
-const baseURI = 'https://deckofcardsapi.com/api/deck/';
+const baseURI = 'https://deckofcardsapi.com/api/deck/'
 
 async function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
-    return response.json();
+    return response.json()
   }
   const errorResponse = await response.json()
-  const error = new Error(errorResponse.error);
-  error.response = response;
-  throw error;
+  const error = new Error(errorResponse.error)
+  error.response = response
+  throw error
 }
 
 const fetchDeck = deck_id => dispatch => {
@@ -102,7 +102,7 @@ export const drawCard = deck_id => dispatch => {
 }
 
 // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/<<pile_name>>/add/?cards=AS,2S
-const addToPlayerPile = (deck, currentCard, player) => dispatch => {
+export const addToPlayerPile = (deck, currentCard, player) => dispatch => {
   const { deck_id, cards } = deck
   cards.push(currentCard)
   const cardCodes = cards.map(card => {
@@ -145,7 +145,7 @@ function shouldFetchDeck(state) {
 }
 
 export const fetchDeckIfNeeded = () => (dispatch, getState) => {
-  const { deck: { deck_id } } = getState();
+  const { deck: { deck_id } } = getState()
   if (shouldFetchDeck(getState())) {
     return dispatch(fetchDeck(deck_id))
   }
@@ -167,7 +167,7 @@ function shouldDrawCard(state) {
 }
 
 export const drawCardIfNeeded = () => (dispatch, getState) => {
-  const { deck: { deck_id } } = getState();
+  const { deck: { deck_id } } = getState()
   if (shouldDrawCard(getState())) {
     return dispatch(drawCard(deck_id))
   }
@@ -185,7 +185,7 @@ function shouldDiscard(state) {
 }
 
 export const discardIfNeeded = () => (dispatch, getState) => {
-  const { deck: { deck_id, cards }, selectedPlayer } = getState();
+  const { deck: { deck_id, cards }, selectedPlayer } = getState()
   if (shouldDiscard(getState())) {
     return dispatch(discard(deck_id, cards[0], selectedPlayer))
   }

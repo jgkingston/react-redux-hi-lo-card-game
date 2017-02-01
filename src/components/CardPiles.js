@@ -21,7 +21,7 @@ export default class CardPiles extends Component {
 
     return (
       <div className="card-piles">
-        <label>
+        <label className="discard-label">
           Cards in pile: {cardsInPile.length}
           <div title="Discard pile" className="discard-pile">
             { lastCard.image ?
@@ -30,7 +30,7 @@ export default class CardPiles extends Component {
             }
           </div>
         </label>
-        <label>
+        <label className="draw-label">
           Cards remaining: {remaining}
           <div title="Draw pile"  className="draw-pile">
             { cards && lastCard.image ?

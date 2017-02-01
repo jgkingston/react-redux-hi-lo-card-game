@@ -5,7 +5,6 @@ import {
   RECEIVE_DECK,
   RECEIVE_DISCARD_PILE } from '../actions'
 
-
 export const deck = (deckState = {
   isFetching: false,
   shouldShuffle: false,

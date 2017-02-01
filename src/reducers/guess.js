@@ -45,6 +45,7 @@ export const guess = (guessState = {
     case SELECT_PLAYER:
       return {
         ...guessState,
+        hasGuessed: false,
         correctGuesses: 0
       }
     default:
